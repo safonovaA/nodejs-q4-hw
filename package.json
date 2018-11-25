@@ -17,9 +17,7 @@
     "@babel/preset-env": "^7.1.6",
     "@babel/preset-stage-2": "^7.0.0",
     "@babel/register": "^7.0.0",
+    "@babel/node": "^7.0.0",
     "nodemon": "^1.18.6"
-  },
-  "dependencies": {
-    "@babel/node": "^7.0.0"
   }
 }
