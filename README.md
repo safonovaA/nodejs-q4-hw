@@ -29,8 +29,14 @@
 ### Async development introduction
 #### Tasks
 1. Create a directory called ​data​. We will assume that CSV files with new products will beuploaded in this directory for processing by our application.
-2. In your application create a local module called ​dirwatcher​. Create class ​DirWatcherthat should be able to watch a given ​path​​ with a given ​delay ​​and emit a​​‘​changed​‘ eventif directory contents have been changed (implement method ​watch(path, delay)​ byyourself, try not to use native ​fs.watch()​).a.When the path is checked for the first time all files should be treated as new. 3. Create a module called ​importer​. Create class ​Importer​. It should be able to listen toDirWatcher ​events and start importing CSV files (converting the data to JavaScriptobjects) on ‘​dirwatcher:changed​’ event.a.Implement ​import(path)​: should return a ​promise ​​with imported data from fileat ​path​.b.Implement ​importSync(path)​: should be synchronous and return all importeddata from file at ​path​.
-4. In ​app.js​​:a.Import all of the above modules.b.Create a ​Dirwatcher​ and ​Importer​ for processing files asynchronously fromdata ​directory.c.Log imported data to console.Note: every CSV file in a directory should be processed only once.Note: feel free to use already implemented library for transforming CSV into JSON.
+2. In your application create a local module called ​dirwatcher​. Create class ​DirWatcherthat should be able to watch a given ​path​​ with a given ​delay ​​and emit a​​‘​changed​‘ eventif directory contents have been changed (implement method ​watch(path, delay)​ byyourself, try not to use native ​fs.watch()​).a.When the path is checked for the first time all files should be treated as new.
+3. Create a module called ​importer​. Create class ​Importer​. It should be able to listen toDirWatcher ​events and start importing CSV files (converting the data to JavaScriptobjects) on ‘​dirwatcher:changed​’ event.
+   1. Implement ​import(path)​: should return a ​promise ​​with imported data from fileat ​path​.
+   1. Implement ​importSync(path)​: should be synchronous and return all importeddata from file at ​path​.
+4. In ​app.js:
+   1. Import all of the above modules.
+   1. Create a ​Dirwatcher​ and ​Importer​ for processing files asynchronously fromdata ​directory.
+   1. Log imported data to console.Note: every CSV file in a directory should be processed only once.Note: feel free to use already implemented library for transforming CSV into JSON.
 #### Evaluation criteria
 1. CSV files are placed in appropriate directory.
 2. DirWatcher​ module is implemented and matches described criteria.
