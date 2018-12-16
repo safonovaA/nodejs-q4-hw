@@ -1,7 +1,7 @@
 import EventEmmiter from 'events';
 import fs from 'fs';
-import { Buffer } from 'buffer';
 import { promisify } from 'util';
+import crypto from 'crypto';
 
 const readFile = promisify(fs.readFile);
 const readdir = promisify(fs.readdir);
@@ -51,7 +51,8 @@ export class DirWatcher extends EventEmmiter {
       return new Promise((resolve) => {
         readFile(`${path}/${file}`)
           .then((data) => {
-            resolve({ file, data })
+            const hash = crypto.createHash('sha1').update(data).digest('hex');
+            resolve({ file, hash })
           })
           .catch((err) => {
             console.log(err);
@@ -63,7 +64,7 @@ export class DirWatcher extends EventEmmiter {
   isFilesChanged(prevFiles, currentFiles) {
     return currentFiles.reduce((acc, curr) => {
       const fileToCompare = prevFiles.find(item => item.file === curr.file);
-      return acc && fileToCompare && Buffer.from(curr.data).equals(Buffer.from(fileToCompare.data));
+      return acc && fileToCompare && curr.hash === fileToCompare.hash;
     }, true);
   }
 
