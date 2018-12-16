@@ -15,25 +15,24 @@ export class DirWatcher extends EventEmmiter {
   }
 
   watch(path, delay) {
-    if (this.isFirstCheck) {
+    this.isFirstCheck ? 
       this.firstReading(path)
-        .then((files) => this.prevFiles = files);
-      setTimeout(() => {
-        this.watch(path, delay);
-      }, delay);
-    } else {
+        .then((files) => {
+          this.prevFiles = files;
+          this.isFirstCheck = false;
+        }) : 
       this.compareFiles(path)
-        .then((files) => this.prevFiles = files);
-      setTimeout(() => {
-        console.log('check completed, start watch')
-        this.watch(path, delay);
-      }, delay);
-    }
+        .then((files) => {
+          this.prevFiles = files;
+        });
+    setTimeout(() => {
+      console.log('check completed, watch')
+      this.watch(path, delay);
+    }, delay);
+
   }
 
   firstReading(path) {
-    this.isFirstCheck = false;
-
     return new Promise((resolve, reject) => {
       readdir(path)
         .then((files) => {
@@ -70,15 +69,15 @@ export class DirWatcher extends EventEmmiter {
 
   compareFiles(path) {
     let isDeleted, isAdded, isChanged;
-
     return new Promise((resolve, reject) => {
       readdir(path)
         .then((files) => {
-          isDeleted = this.prevFilesList.reduce((acc, curr) => (!files.includes(curr)), false);
-          isAdded = files.reduce((acc, curr) => (!this.prevFilesList.includes(curr)), false);
+          isDeleted = this.prevFilesList.reduce((acc, curr) => ((!files.includes(curr)) || acc), false);
+          isAdded = files.reduce((acc, curr) => (!acc && !this.prevFilesList.includes(curr)), false);
           this.readFiles(path, files)
             .then((files) => {
               isChanged = !this.isFilesChanged(this.prevFiles, files);
+              console.log(`add ${isAdded} delete ${isDeleted} change ${isChanged}`)
               if (isDeleted || isAdded || isChanged) {
                 this.emit('changed');
               }
