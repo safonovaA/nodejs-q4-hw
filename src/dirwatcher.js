@@ -62,10 +62,10 @@ export class DirWatcher extends EventEmmiter {
   }
 
   isFilesChanged(prevFiles, currentFiles) {
-    return currentFiles.reduce((acc, curr) => {
+    return currentFiles.every((curr) => {
       const fileToCompare = prevFiles.find(item => item.file === curr.file);
-      return acc && fileToCompare && curr.hash === fileToCompare.hash;
-    }, true);
+      return fileToCompare && curr.hash === fileToCompare.hash;
+    });
   }
 
   compareFiles(path) {
@@ -73,19 +73,18 @@ export class DirWatcher extends EventEmmiter {
     return new Promise((resolve, reject) => {
       readdir(path)
         .then((files) => {
-          isDeleted = this.prevFilesList.reduce((acc, curr) => ((!files.includes(curr)) || acc), false);
-          isAdded = files.reduce((acc, curr) => (!acc && !this.prevFilesList.includes(curr)), false);
+          isDeleted = !this.prevFilesList.every((item) => files.includes(item));
+          isAdded = !files.every((item) => this.prevFilesList.includes(item));
           this.readFiles(path, files)
             .then((files) => {
               isChanged = !this.isFilesChanged(this.prevFiles, files);
-              console.log(`add ${isAdded} delete ${isDeleted} change ${isChanged}`)
               if (isDeleted || isAdded || isChanged) {
                 this.emit('changed');
               }
               resolve(files);
             })
         })
-        .catch((err) => reject(err))
+        .catch((err) => reject(err));
     });
   }
 }
