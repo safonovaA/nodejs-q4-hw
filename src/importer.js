@@ -1,5 +1,6 @@
-import { promisify } from 'util';
 import fs from 'fs';
+import { promisify } from 'util';
+
 const csvjson = require('csvjson');
 
 const readFile = promisify(fs.readFile);
@@ -15,8 +16,7 @@ export class Importer {
             return new Promise((resolve) => {
               readFile(`${path}/${file}`)
                 .then((data) => {
-                  const buf = Buffer.from(data);
-                  resolve(csvjson.toObject(buf.toString()))
+                  resolve(csvjson.toObject(data.toString()))
                 })
                 .catch((err) => {
                   console.log(err);
@@ -33,8 +33,7 @@ export class Importer {
     const files = fs.readdirSync(path);
     return files.map((file) => {
       const data = fs.readFileSync(`${path}/${file}`);
-      const buf = Buffer.from(data);
-      return csvjson.toObject(buf.toString());
+      return csvjson.toObject(data.toString());
     })
   }
 }

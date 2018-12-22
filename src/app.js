@@ -1,7 +1,9 @@
-import { User, Product } from './models';
-import config from './config/config';
-import { DirWatcher } from './dirwatcher';
 import path from 'path';
+
+import config from './config/config';
+import { User, Product } from './models';
+
+import { DirWatcher } from './dirwatcher';
 import { Importer } from './importer';
 
 console.log(config.name);
@@ -13,7 +15,6 @@ const importer = new Importer();
 
 dw.watch(path.resolve(__dirname, 'data'), 3000);
 dw.on('changed', () => {
-  console.log('changed');
   importer.import(path.resolve(__dirname, 'data'))
     .then((data) => {
       console.log('Imported data via import:', data);

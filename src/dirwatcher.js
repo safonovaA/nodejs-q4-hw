@@ -1,7 +1,7 @@
+import crypto from 'crypto';
 import EventEmmiter from 'events';
 import fs from 'fs';
 import { promisify } from 'util';
-import crypto from 'crypto';
 
 const readFile = promisify(fs.readFile);
 const readdir = promisify(fs.readdir);
@@ -26,7 +26,6 @@ export class DirWatcher extends EventEmmiter {
           this.prevFiles = files;
         });
     setTimeout(() => {
-      console.log('check completed, watch')
       this.watch(path, delay);
     }, delay);
 
