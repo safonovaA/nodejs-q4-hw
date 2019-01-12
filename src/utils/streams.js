@@ -1,14 +1,19 @@
 const fs = require('fs');
+const path = require('path');
+const { promisify } = require('util');
+
 const meow = require('meow');
 const through = require('through2');
 const csvjson = require('csvjson');
-const path = require('path');
+
 const transformingStream = through(transformString, end);
-const cvsjsonStream = through(convertFromFile, end);
+const cvsjsonStream = through(convertFile, end);
+
+const readdir = promisify(fs.readdir);
 
 const options = {
-  string: [ 'action', 'file', 'help'],
-  alias: { a: 'action', f: 'file', h: 'help' },
+  string: [ 'action', 'file', 'help', 'path'],
+  alias: { a: 'action', f: 'file', h: 'help', p: 'path' },
 }
 
 const help = meow(`
@@ -21,7 +26,14 @@ const help = meow(`
         -a, --action <actionName>      call provided action, --file is required for
                                        outputFile, convertFromFile, convertToFile actions                            
         -f, --file <filePath>          file ?
+        -p, --path <directotyPath>     path to directory for cssBundler action
 `);
+
+const CSV = /.csv$/;
+const CSS = /.css$/;
+const BUNDLE_FILE = 'bundle.css';
+const FILE_TO_APPEND = 'nodejs-homework3.css';
+
 const argv = require('minimist')(process.argv.slice(2), options);
 const argumentsLength = Object.keys(help.flags).length;
 
@@ -32,6 +44,7 @@ const actions = {
   outputFile: (filePath) => outputFile(filePath),
   convertFromFile: (filePath) => applyConvertFromFile(filePath),
   convertToFile: (filePath) => applyConvertToFile(filePath),
+  cssBundler: (path) => applyCssBundler(path),
 }
 
 if (!argumentsLength) {
@@ -39,9 +52,10 @@ if (!argumentsLength) {
 } else {
   const action = argv['action'] || '';
   const file = argv['file'] || '';
+  const path = argv['path'] || '';
   const string = argv['_'] ? argv['_'].join(' ') : '';
 
-  if (!action && !(action && file || action && string)) {
+  if (!action && !(action && file || action && string || action && path)) {
     help.showHelp();
     return;
   }
@@ -49,19 +63,12 @@ if (!argumentsLength) {
   if (isStrAction(action) && string) {
     actions[action](string);
   } else if (isFileAction(action) && file) {
-    console.log(action);
     actions[action](file);
+  } else if (action === 'cssBundler' && path){
+    actions[action](path);
   } else {
     help.showHelp();
   }
-}
-
-function isFileAction(action) {
-  return ['convertToFile', 'convertFromFile', 'outputFile'].includes(action);
-}
-
-function isStrAction(action) {
-  return ['reverse', 'transform'].includes(action);
 }
 
 function applyReverse(str) {
@@ -78,35 +85,62 @@ function applyTransform(str) {
   process.exit();
 }
 
+function applyConvertFromFile(filePath) {
+  isCsv(filePath) ?
+    fs.createReadStream(require('path').resolve(__dirname, `../data/${filePath}`))
+      .pipe(cvsjsonStream)
+      .pipe(process.stdout) :
+    console.log('Should be .csv');
+}
+
+function applyConvertToFile(filePath) {
+  isCsv(filePath) ?
+    fs.createReadStream(path.resolve(__dirname, `../data/${filePath}`))
+      .pipe(cvsjsonStream)
+      .pipe(fs.createWriteStream(path.resolve(__dirname, `../data/${filePath.replace(CSV, '.json')}`))) :
+      console.log('Should be .csv');
+}
+
+function applyCssBundler(path) {
+  const fullPath = require('path').resolve(__dirname, `../${path}`);
+
+  readdir(fullPath)
+    .then((files) => {
+      return Promise.all(files.map((file, i) => {
+        if (i === 0) {
+          fs.createWriteStream(`${fullPath}/${BUNDLE_FILE}`).write('', (err) => {
+            if (err) throw err;
+          });
+        }
+        if (isCSSToBundle(file)) { 
+          fs.createReadStream(`${fullPath}/${file}`)
+            .on('data', (data) => {
+              fs.createWriteStream(`${fullPath}/${BUNDLE_FILE}`, { flags: 'a'})
+                .write(data, (err) => {
+                  if (err) throw err;
+                });
+            })
+            .on('close', () => {
+              return Promise.resolve()
+            }); 
+        }
+      }))
+    })
+    .then(() => {
+      fs.createReadStream(`${fullPath}/${FILE_TO_APPEND}`)
+        .on('data', (data) => {
+          fs.appendFile(`${fullPath}/${BUNDLE_FILE}`, data, (err) => { if (err) throw err});
+        })
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
 function outputFile(filePath) { 
   fs.createReadStream(require('path').resolve(__dirname, `../data/${filePath}`))
     .on('error', (err) => {console.log(err)})
     .pipe(process.stdout);
-}
-
-function applyConvertFromFile(filePath) {
-  const regExp = /.csv$/;
-  if (!regExp.test(filePath)) {
-    console.log('Should be .csv');
-    return;
-  }
-
-  fs.createReadStream(require('path')
-    .resolve(__dirname, `../data/${filePath}`))
-    .pipe(cvsjsonStream)
-    .pipe(process.stdout);
-}
-function applyConvertToFile(filePath) {
-  const csv = /.csv$/;
-  const json = '.json';
-  if (!csv.test(filePath)) {
-    console.log('Should be .csv');
-    return;
-  }
-  const outputFilePath = filePath.replace(csv, json);
-  fs.createReadStream(path.resolve(__dirname, `../data/${filePath}`))
-    .pipe(cvsjsonStream)
-    .pipe(fs.createWriteStream(path.resolve(__dirname, `../data/${outputFilePath}`)));
 }
 
 function reverse(str) { 
@@ -117,14 +151,36 @@ function transform(str) {
   return str.toUpperCase();
 }
 
-function convertFromFile(buffer, encoding, end) { 
-  this.push(JSON.stringify(csvjson.toObject(buffer.toString())))
+function csvToJSON(buffer) {
+  return JSON.stringify(csvjson.toObject(buffer.toString()))
+}
+
+function convertFile(buffer, encoding, end) { 
+  this.push(csvToJSON(buffer));
   end();
 }
+
 function transformString(buffer, encoding, end) {
   this.push(transform(buffer.toString()));
   end();
 }
+
 function end() {
   process.exit();
+}
+
+function isFileAction(action) {
+  return ['convertToFile', 'convertFromFile', 'outputFile'].includes(action);
+}
+
+function isStrAction(action) {
+  return ['reverse', 'transform'].includes(action);
+}
+
+function isCsv(fileName) {
+  return CSV.test(fileName);
+}
+
+function isCSSToBundle(fileName) {
+  return CSS.test(fileName) && fileName !== FILE_TO_APPEND && fileName !== BUNDLE_FILE;
 }
