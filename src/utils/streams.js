@@ -1,7 +1,10 @@
 const fs = require('fs');
 const meow = require('meow');
 const through = require('through2');
-const stream = through(write, end);
+const csvjson = require('csvjson');
+const path = require('path');
+const transformingStream = through(transformString, end);
+const cvsjsonStream = through(convertFromFile, end);
 
 const options = {
   string: [ 'action', 'file', 'help'],
@@ -27,13 +30,9 @@ const actions = {
   reverse: (str) => applyReverse(str),
   transform: (str) => applyTransform(str),
   outputFile: (filePath) => outputFile(filePath),
-  convertFromFile: (filePath) => convertFromFile(filePath),
-  convertToFile: (filePath) => convertToFile(filePath),
+  convertFromFile: (filePath) => applyConvertFromFile(filePath),
+  convertToFile: (filePath) => applyConvertToFile(filePath),
 }
-
-function outputFile(filePath) { console.log(1 + 1, 'output');}
-function convertFromFile(filePath) { console.log(1 + 1, 'convertFrom');}
-function convertToFile(filePath) { console.log(1 + 1, 'convertTo');}
 
 if (!argumentsLength) {
   help.showHelp();
@@ -51,6 +50,7 @@ if (!argumentsLength) {
     actions[action](string);
   } else if (isFileAction(action) && file) {
     console.log(action);
+    actions[action](file);
   } else {
     help.showHelp();
   }
@@ -73,9 +73,40 @@ function applyReverse(str) {
 }
 
 function applyTransform(str) {
-  process.stdin.pipe(stream).pipe(process.stdout);
+  process.stdin.pipe(transformingStream).pipe(process.stdout);
   process.stdin.emit('data', str);
   process.exit();
+}
+
+function outputFile(filePath) { 
+  fs.createReadStream(require('path').resolve(__dirname, `../data/${filePath}`))
+    .on('error', (err) => {console.log(err)})
+    .pipe(process.stdout);
+}
+
+function applyConvertFromFile(filePath) {
+  const regExp = /.csv$/;
+  if (!regExp.test(filePath)) {
+    console.log('Should be .csv');
+    return;
+  }
+
+  fs.createReadStream(require('path')
+    .resolve(__dirname, `../data/${filePath}`))
+    .pipe(cvsjsonStream)
+    .pipe(process.stdout);
+}
+function applyConvertToFile(filePath) {
+  const csv = /.csv$/;
+  const json = '.json';
+  if (!csv.test(filePath)) {
+    console.log('Should be .csv');
+    return;
+  }
+  const outputFilePath = filePath.replace(csv, json);
+  fs.createReadStream(path.resolve(__dirname, `../data/${filePath}`))
+    .pipe(cvsjsonStream)
+    .pipe(fs.createWriteStream(path.resolve(__dirname, `../data/${outputFilePath}`)));
 }
 
 function reverse(str) { 
@@ -86,11 +117,14 @@ function transform(str) {
   return str.toUpperCase();
 }
 
-function write(buffer, encoding, end) {
+function convertFromFile(buffer, encoding, end) { 
+  this.push(JSON.stringify(csvjson.toObject(buffer.toString())))
+  end();
+}
+function transformString(buffer, encoding, end) {
   this.push(transform(buffer.toString()));
   end();
 }
 function end() {
-  console.log('end');
-  done();
+  process.exit();
 }
