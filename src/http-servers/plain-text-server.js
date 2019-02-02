@@ -1,11 +1,18 @@
 const http = require('http');
 
-const server = http
-  .createServer()
-  .on('request', (req, res) => {
-    res.writeHead(200, {
-      'Content-type': 'text/plain'
-    });
-    res.end('Hello word');
-  })
-  .listen(3000);
+const port = 3000;
+const server = http.createServer();
+
+server.on('request', (req, res) => {
+  res.writeHead(200, {
+    'Content-type': 'text/plain'
+  });
+  res.end('Hello word');
+});
+
+server.listen(port, (err) => {
+  if (err) {
+    return console.log('something bad happened', err)
+  }
+  console.log(`plain-text-server is listening on ${port}`)
+});
