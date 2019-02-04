@@ -12,10 +12,10 @@ const transformRequest = (req) => new Transform({
       httpVersion,
     } = req;
     this.push(JSON.stringify({
-          requestLine: `${method} ${url} HTTP/${httpVersion}`,
-          headers: req.headers,
-          messageBody: chunk.toString(),
-        }));
+      requestLine: `${method} ${url} HTTP/${httpVersion}`,
+      headers: req.headers,
+      messageBody: chunk.toString(),
+    }));
     callback();
   }
 });

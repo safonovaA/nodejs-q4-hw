@@ -29,8 +29,6 @@ server.on('request', (req, res) => {
   fs.createReadStream(path.resolve(__dirname, 'index.html'))
   .pipe(transformMessage(message))
   .pipe(res);
-  // res.write('<head><meta charset="utf-8"></head><body><h1>​{message}​</h1></body>'.replace(/{message}/, message));
-  // res.end();
 });
 
 server.listen(port, (err) => {
