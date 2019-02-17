@@ -12,6 +12,8 @@ import users from '../data/users';
 import tokens from '../data/tokens';
 
 const auth = Router();
+const FACEBOOK_APP_ID = '410171629738155';
+const FACEBOOK_APP_SECRET = '05a7c0dfa530abc5b0f3eb9ecde41574';
 
 passport.use(new LocalStrategy({
   usernameField: 'username',
@@ -27,12 +29,11 @@ passport.use(new LocalStrategy({
 }));
 
 passport.use(new FacebookStrategy({
-  clientID: 'FACEBOOK_APP_ID',
-  clientSecret: 'FACEBOOK_APP_SECRET',
+  clientID: FACEBOOK_APP_ID,
+  clientSecret: FACEBOOK_APP_SECRET,
   callbackURL: 'http://localhost:8080/auth/facebook/callback',
 }, (accessToken, refreshToken, profile, cb) => {
-  const user = users.find((user) => user.username === username);
-  cb(user);
+  cb();
 }));
 
 passport.use(new TwitterStrategy({
@@ -40,8 +41,7 @@ passport.use(new TwitterStrategy({
   consumerSecret: 'TWITTER_CONSUMER_SECRET',
   callbackURL: 'http://localhost:8080/auth/twitter/callback',
 }, (token, tokenSecret, profile, cb) => {
-  const user = users.find((user) => user.username === username);
-  cb(user);
+  cb();
 }));
 
 passport.use(new GoogleStrategy({
@@ -49,8 +49,7 @@ passport.use(new GoogleStrategy({
   consumerSecret: 'GOOGLE_CONSUMER_SECRET',
   callbackURL: "http://localhost:8080/auth/google/callback"
 }, (token, tokenSecret, profile, cb) => {
-  const user = users.find((user) => user.username === username);
-  cb(user);
+  cb();
 }));
 
 auth.use(bodyParser.json());
