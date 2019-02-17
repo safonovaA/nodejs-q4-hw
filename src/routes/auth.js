@@ -31,25 +31,25 @@ passport.use(new LocalStrategy({
 passport.use(new FacebookStrategy({
   clientID: FACEBOOK_APP_ID,
   clientSecret: FACEBOOK_APP_SECRET,
-  callbackURL: 'http://localhost:8080/auth/facebook/callback',
+  callbackURL: 'http://localhost:8080/api/auth/facebook/callback',
 }, (accessToken, refreshToken, profile, cb) => {
-  cb();
+  cb(null, profile);
 }));
 
 passport.use(new TwitterStrategy({
   consumerKey: 'TWITTER_CONSUMER_KEY',
   consumerSecret: 'TWITTER_CONSUMER_SECRET',
-  callbackURL: 'http://localhost:8080/auth/twitter/callback',
+  callbackURL: 'http://localhost:8080/api/auth/twitter/callback',
 }, (token, tokenSecret, profile, cb) => {
-  cb();
+  cb(null, profile);
 }));
 
 passport.use(new GoogleStrategy({
   consumerKey: 'www.example.com',
   consumerSecret: 'GOOGLE_CONSUMER_SECRET',
-  callbackURL: "http://localhost:8080/auth/google/callback"
+  callbackURL: "http://localhost:8080/api/auth/google/callback"
 }, (token, tokenSecret, profile, cb) => {
-  cb();
+  cb(null, profile);
 }));
 
 auth.use(bodyParser.json());
@@ -64,9 +64,10 @@ auth.get('/facebook', passport.authenticate('facebook'));
 
 auth.get(
   '/facebook/callback',
-  passport.authenticate('facebook'),
+  passport.authenticate('facebook', {session: false}),
   (req, res) => {
-    res.send('Success');
+    const userName = req.user.displayName;
+    res.status(200).send(`<h1>Hello, ${userName}!</h1>`);
   }
 );
 
