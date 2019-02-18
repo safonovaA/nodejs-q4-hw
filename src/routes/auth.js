@@ -4,7 +4,7 @@ import passport from 'passport';
 import LocalStrategy from 'passport-local';
 import FacebookStrategy from 'passport-facebook';
 import TwitterStrategy from 'passport-twitter';
-import GoogleStrategy from 'passport-google-oauth1';
+import GoogleStrategy from 'passport-google-oauth20';
 
 import bodyParser from 'body-parser';
 
@@ -14,6 +14,8 @@ import tokens from '../data/tokens';
 const auth = Router();
 const FACEBOOK_APP_ID = '410171629738155';
 const FACEBOOK_APP_SECRET = '05a7c0dfa530abc5b0f3eb9ecde41574';
+const GOOGLE_CLIENT_ID = '1006638581354-4mhmakn7hrr8osdao120t5tgbfqrnkjl.apps.googleusercontent.com';
+const GOOGLE_CLIENT_SECRET = 'wPePSXefiHSxRu_rcUdZ5e6Q';
 
 passport.use(new LocalStrategy({
   usernameField: 'username',
@@ -45,8 +47,8 @@ passport.use(new TwitterStrategy({
 }));
 
 passport.use(new GoogleStrategy({
-  consumerKey: 'www.example.com',
-  consumerSecret: 'GOOGLE_CONSUMER_SECRET',
+  clientID: GOOGLE_CLIENT_ID,
+  clientSecret: GOOGLE_CLIENT_SECRET,
   callbackURL: "http://localhost:8080/api/auth/google/callback"
 }, (token, tokenSecret, profile, cb) => {
   cb(null, profile);
@@ -82,12 +84,13 @@ auth.get(
 );
 
 auth.get('/google',
-  passport.authenticate('google'));
+  passport.authenticate('google', {scope: ['profile']}));
 
 auth.get('/google/callback', 
-  passport.authenticate('google'),
+  passport.authenticate('google', {session: false}),
   (req, res) => {
-    res.send('Success');
+    const userName = req.user.displayName;
+    res.status(200).send(`<h1>Hello, ${userName}!</h1>`);
   }
 );
 
