@@ -5,7 +5,7 @@ const csvjson = require('csvjson');
 
 const readFile = promisify(fs.readFile);
 const Sequelize = require('sequelize');
-const Product = require('./models/product').Product;
+const product = require('./models/product');
 const config = require('./config/config').development;
 const params = {
   host: config.host || 'localhost',
@@ -27,13 +27,12 @@ export default class DB {
       ...params,
       port,
     });
-    this.product = require('./models/product')(this.sequelize, Sequelize);
+    this.product = product(this.sequelize, Sequelize);
   }
   connect() {
     return this.sequelize
       .authenticate()
       .then(() => {
-        
         return Promise.resolve();
       })
       .catch(err => {
@@ -41,49 +40,18 @@ export default class DB {
       });
   }
   async importProducts(path) {
-    const data = await readFile(`${path}`);
-    // data.map(async (item) => {
-    //   await this.product.findOrCreate({
-    //     where: {},
-    //     defaults: {
-    //       title: item.title,
-    //       description: item.description,
-    //       price: +item.price,
-    //       amount: +item.amount,
-    //     }
-    //   })
-    //     .spread((product, created) => {
-    //       console.log(product.get({
-    //         plain: true
-    //       }))
-    //       console.log(created);
-    //     })
-    // })
+    const existedData = await this.product.findAndCountAll();
+    if (!existedData.count) {
+      const data = await readFile(`${path}`);
+      const convertedData = csvjson
+        .toObject(data.toString())
+        .map(item => ({
+          ...item,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }));
+      await this.sequelize.getQueryInterface().bulkInsert('Products', convertedData);
+    }
+    return await this.sequelize.close();
   }
-  // importProducts(path) {
-  //   readFile(`${path}`)
-  //     .then((data) => {
-  //       return csvjson.toObject(data.toString())
-  //     })
-  //     .then(data => {
-  //       data.map((item) => {
-  //         console.log(item);
-  //         this.product.findOrCreate({
-  //           where: {},
-  //           defaults: {
-  //             title: item.title,
-  //             description: item.description,
-  //             price: +item.price,
-  //             amount: +item.amount,
-  //           }
-  //         })
-  //           .spread((product, created) => {
-  //             console.log(product.get({
-  //               plain: true
-  //             }))
-  //             console.log(created);
-  //           })
-  //       })
-  //     })
-  // }
 }

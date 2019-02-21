@@ -25,11 +25,11 @@ getDBPort()
     dbPort = data.split(':')[1];
     console.log(`Database on port: ${dbPort}`);
     db = new DB(dbPort);
-    db.connect().then(() => {
-      db.importProducts(path.resolve(__dirname, 'data/products.csv'));
+    db.connect().then(async () => {
+      await db.importProducts(path.resolve(__dirname, 'data/products.csv'));
     })
   })
   .catch((err) => {
-    console.log('Start database in docker container');
+    console.log(err);
     process.exit();
   });
