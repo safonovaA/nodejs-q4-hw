@@ -6,6 +6,7 @@ import { parseQuery } from './middlewares/parse-query';
 import router from './routes/routes';
 import DB from './database/db';
 import { getDBPort } from './helpers/get-port';
+import bodyParser from 'body-parser';
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -14,6 +15,7 @@ let dbPort;
 
 app.use(parseCookie);
 app.use(parseQuery);
+app.use(bodyParser.json());
 app.use('/api', router);
 
 app.listen(port, () => {
@@ -23,8 +25,9 @@ app.listen(port, () => {
 getDBPort()
   .then((data) => {
     dbPort = data.split(':')[1];
+    process.env.POSTGRES_PORT = dbPort;
     console.log(`Database on port: ${dbPort}`);
-    db = new DB(dbPort);
+    db = new DB();
     db.connect().then(async () => {
       await db.importProducts(path.resolve(__dirname, 'data/products.csv'));
     })
