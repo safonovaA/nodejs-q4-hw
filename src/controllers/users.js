@@ -4,6 +4,24 @@ import jwt from 'jsonwebtoken';
 const User = require('../database/models').User;
 
 module.exports = {
+  getAll(req, res) {
+    return User
+      .findAll({attributes: ['providerId', 'firstName', 'lastName', 'provider']})
+      .then((users) => res.status(200).send(users))
+      .catch((err) => res.send(400).send(err));
+  },
+  authWithProvider(req, res) {
+    return User
+      .findOrCreate({
+        where: {
+          providerId: req.user.providerId,
+          provider: req.user.provider,
+        },
+        defaults: req.user,
+      })
+      .then((user) => res.status(200).send('Hello!'))
+      .catch((err) => res.status(400).send(err));
+  },
   authWithJWT(req, res) {
     const username = req.body.username;
     const password = crypto.createHash('sha1').update(req.body.password).digest('hex');

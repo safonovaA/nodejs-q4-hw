@@ -12,6 +12,7 @@ import users from '../data/users';
 import tokens from '../data/tokens';
 
 const auth = Router();
+const usersController = require('../controllers').users;
 const FACEBOOK_APP_ID = '410171629738155';
 const FACEBOOK_APP_SECRET = '05a7c0dfa530abc5b0f3eb9ecde41574';
 const GOOGLE_CLIENT_ID = '1006638581354-4mhmakn7hrr8osdao120t5tgbfqrnkjl.apps.googleusercontent.com';
@@ -35,7 +36,14 @@ passport.use(new FacebookStrategy({
   clientSecret: FACEBOOK_APP_SECRET,
   callbackURL: 'http://localhost:8080/api/auth/facebook/callback',
 }, (accessToken, refreshToken, profile, cb) => {
-  cb(null, profile);
+  const userName = profile.displayName.split(' ');
+  const user = {
+    provider: 'facebook',
+    providerId: profile.id,
+    firstName: userName[0],
+    lastName: userName[1],
+  }
+  cb(null, user);
 }));
 
 passport.use(new TwitterStrategy({
@@ -51,7 +59,13 @@ passport.use(new GoogleStrategy({
   clientSecret: GOOGLE_CLIENT_SECRET,
   callbackURL: "http://localhost:8080/api/auth/google/callback"
 }, (token, tokenSecret, profile, cb) => {
-  cb(null, profile);
+  const user = {
+    provider: 'google',
+    providerId: profile.id,
+    firstName: profile.name.givenName,
+    lastName: profile.name.familyName,
+  }
+  cb(null, user);
 }));
 
 auth.use(bodyParser.json());
@@ -67,10 +81,7 @@ auth.get('/facebook', passport.authenticate('facebook'));
 auth.get(
   '/facebook/callback',
   passport.authenticate('facebook', {session: false}),
-  (req, res) => {
-    const userName = req.user.displayName;
-    res.status(200).send(`<h1>Hello, ${userName}!</h1>`);
-  }
+  usersController.authWithProvider,
 );
 
 auth.get('/twitter', passport.authenticate('twitter'));
@@ -88,10 +99,7 @@ auth.get('/google',
 
 auth.get('/google/callback', 
   passport.authenticate('google', {session: false}),
-  (req, res) => {
-    const userName = req.user.displayName;
-    res.status(200).send(`<h1>Hello, ${userName}!</h1>`);
-  }
+  usersController.authWithProvider,
 );
 
 export default auth;

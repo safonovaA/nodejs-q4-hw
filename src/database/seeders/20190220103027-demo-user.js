@@ -9,7 +9,7 @@ module.exports = {
       username: 'batman91',
       email: 'demo@demo.com',
       password: crypto.createHash('sha1').update('password1').digest('hex'),
-      type: 'internal',
+      provider: 'internal',
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -19,7 +19,7 @@ module.exports = {
       username: 'johndoe',
       email: 'demo@demo.com',
       password: crypto.createHash('sha1').update('password2').digest('hex'),
-      type: 'internal',
+      provider: 'internal',
       createdAt: new Date(),
       updatedAt: new Date(),
     }

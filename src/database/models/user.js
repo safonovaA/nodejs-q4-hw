@@ -6,7 +6,8 @@ module.exports = (sequelize, DataTypes) => {
     lastName: DataTypes.STRING,
     email: DataTypes.STRING,
     password: DataTypes.STRING,
-    type: DataTypes.STRING,
+    provider: DataTypes.STRING,
+    providerId: DataTypes.STRING,
   }, {});
   return User;
 };

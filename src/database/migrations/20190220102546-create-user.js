@@ -21,7 +21,10 @@ module.exports = {
         type: Sequelize.STRING,
         unique: 'uniqueTag',
       },
-      type: {
+      provider: {
+        type: Sequelize.STRING
+      },
+      providerId: {
         type: Sequelize.STRING
       },
       password: {
