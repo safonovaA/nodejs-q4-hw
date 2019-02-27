@@ -1,21 +1,19 @@
 import { Router } from 'express';
-
+import verifyJWT from '../middlewares/verify-jwt-token';
+const productsController = require('../controllers').products;
+const reviewsController = require('../controllers').reviews;
 const products = Router();
 
-products.get('/', (req, res) => {
-  res.send('All products');
-});
+products.use(verifyJWT);
 
-products.get('/:id', (req, res) => {
-  res.send(`Product with id: ${req.params.id}`);
-});
+products.get('/', productsController.getAll);
 
-products.get('/:id/reviews', (req, res) => {
-  res.send(`All reviews for Product #${req.params.id}`);
-});
+products.get('/:id', productsController.getById);
 
-products.post('/', (req, res) => {
-  res.send('Add new product');
-});
+products.get('/:id/reviews', reviewsController.getAllReviewsForProduct);
+
+products.post('/:id/reviews', reviewsController.create);
+
+products.post('/', productsController.create);
 
 export default products;
