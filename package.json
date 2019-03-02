@@ -10,7 +10,7 @@
     "postdb": "sequelize db:seed:all",
     "build": "babel src -d dist --no-babelrc --presets=@babel/env",
     "start": "nodemon --exec babel-node --no-babelrc --presets=@babel/env src/index.js",
-    "start-random-city": "nodemon --exec babel-node --no-babelrc --presets=@babel/env src/http-servers/random-city-server.js",
+    "start-random-city": "nodemon --exec babel-node --no-babelrc --presets=@babel/env src/http-servers/random-city-mongoose-server.js",
     "test": ""
   },
   "keywords": [],
@@ -34,6 +34,7 @@
     "meow": "^5.0.0",
     "minimist": "^1.2.0",
     "mongodb": "^3.1.13",
+    "mongoose": "^5.4.16",
     "passport": "^0.4.0",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^1.0.0",

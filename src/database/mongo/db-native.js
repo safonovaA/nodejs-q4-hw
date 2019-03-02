@@ -18,11 +18,10 @@ export default class DBMongoNativeDriver {
     if (counter === 0) {
       await this.insertCities();
     }
-    return Promise.resolve();
   }
   async insertCities() {
     await client.db(dbName).collection('cities').insertMany(cities)
-      .catch(err => assert.equal(err));
+      .catch(err => console.error(err));
   }
   async getRandomDocument() {
     const randomDocument = await client
@@ -35,7 +34,7 @@ export default class DBMongoNativeDriver {
   async countCollection(){
     return await client.db(dbName)
       .collection('cities')
-      .count();
+      .countDocuments({});
   }
   closeConnection() {
     client.close();
