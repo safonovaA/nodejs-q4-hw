@@ -1,18 +1,15 @@
 const mongoose = require('mongoose');
+import path from 'path';
 import cities from '../../data/cities';
+import City from './models/city';
+import Product from './models/product';
+const url = 'mongodb://localhost:32769/test';
+import fs from 'fs';
+import { promisify } from 'util';
 
-const url = 'mongodb://localhost:32768/test';
-const citySchema = new mongoose.Schema({
-  name: String,
-  country: String,
-  capital: Boolean,
-  location: {
-    lat: Number,
-    long: Number,
-  },
-})
-const City = new mongoose.model('City', citySchema);
+const csvjson = require('csvjson');
 
+const readFile = promisify(fs.readFile);
 export default class DBMongoose {
   async connect() {
     await mongoose.connect(url);
@@ -21,13 +18,24 @@ export default class DBMongoose {
     let counter;
     await this.connect();
     await this.insertCities();
-    counter = await City.countDocuments({});
-    if (counter === 0) {
+    counter = {
+      cities: await City.countDocuments({}),
+      products: await Product.countDocuments({}),
+    };
+    if (counter.cities === 0) {
       await this.insertCities();
+    }
+    if (counter.products === 0) {
+      await this.insertProducts();
     }
   }
   async insertCities() {
     await City.insertMany(cities)
+      .catch(err => console.error(err));
+  }
+  async insertProducts() {
+    const products = await this.importProducts(path.resolve(__dirname, '../../data/products.csv'));
+    await Product.insertMany(products)
       .catch(err => console.error(err));
   }
   async getRandomDocument() {
@@ -35,5 +43,11 @@ export default class DBMongoose {
     const rand = Math.floor(Math.random() * count);
     const randomDoc = await City.findOne().skip(rand);
     return randomDoc;
+  }
+  async importProducts(path) {
+    const data = await readFile(`${path}`);
+    const convertedData = csvjson
+      .toObject(data.toString());
+    return convertedData;
   }
 }
