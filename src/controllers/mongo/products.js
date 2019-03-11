@@ -24,6 +24,13 @@ const ProductsMongoController = {
       .create(product)
       .then(product => res.status(201).send(product))
       .catch(err => res.status(400).send(err))
-  }
+  },
+  delete(req, res) {
+    const { id } = req.params;
+    return Product
+      .deleteOne({_id: id})
+      .then(() => res.status(202).send('Deleted'))
+      .catch((err) => res.status(400).send(err));
+  },
 };
 export default ProductsMongoController;

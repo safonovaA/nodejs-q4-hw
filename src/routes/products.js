@@ -27,4 +27,6 @@ products.post('/:id/reviews', reviewsController.create);
 
 products.post('/', productsController.create);
 
+products.delete('/:id', productsController.delete);
+
 export default products;
