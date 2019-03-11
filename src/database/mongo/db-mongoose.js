@@ -24,12 +24,13 @@ export default class DBMongoose {
   async init() {
     let counter;
     await this.connect();
-    await this.insertCities();
+
     counter = {
       cities: await City.countDocuments({}),
       products: await Product.countDocuments({}),
       users: await User.countDocuments({}),
     };
+
     if (counter.cities === 0) {
       await this.insertCities();
     }
