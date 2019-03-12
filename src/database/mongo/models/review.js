@@ -7,6 +7,7 @@ export const reviewSchema = new mongoose.Schema({
   },
   content: String,
   score: String,
+  lastModifiedAt: Date,
 })
 const Review = new mongoose.model('Review', reviewSchema);
 

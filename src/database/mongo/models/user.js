@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema({
     enum: ['internal', 'google', 'facebook', 'twitter'],
   },
   providerId: String,
+  lastModifiedAt: Date,
 })
 const User = new mongoose.model('User', userSchema);
 

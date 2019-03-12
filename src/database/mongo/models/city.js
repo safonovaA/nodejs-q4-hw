@@ -11,7 +11,8 @@ const citySchema = new mongoose.Schema({
     lat: Number,
     long: Number,
   },
-})
-const City = new mongoose.model('City', citySchema);
+  lastModifiedAt: Date,
+});
 
+const City = new mongoose.model('City', citySchema);
 export default City;
