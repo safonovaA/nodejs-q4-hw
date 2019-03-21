@@ -1,6 +1,9 @@
 import { Router } from 'express';
+import verifyJWT from '../middlewares/verify-jwt-token';
 
 const products = Router();
+
+products.use(verifyJWT);
 
 products.get('/', (req, res) => {
   res.send('All products');
