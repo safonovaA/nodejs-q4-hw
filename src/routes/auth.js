@@ -11,13 +11,24 @@ import bodyParser from 'body-parser';
 import users from '../data/users';
 import tokens from '../data/tokens';
 
-const auth = Router();
-const usersController = require('../controllers').users;
+const usersPostgresController = require('../controllers').users;
+import UsersMongoController from '../controllers/mongo/users';
+
+import config from '../config/config';
+
 const FACEBOOK_APP_ID = '410171629738155';
 const FACEBOOK_APP_SECRET = '05a7c0dfa530abc5b0f3eb9ecde41574';
 const GOOGLE_CLIENT_ID = '1006638581354-4mhmakn7hrr8osdao120t5tgbfqrnkjl.apps.googleusercontent.com';
 const GOOGLE_CLIENT_SECRET = 'wPePSXefiHSxRu_rcUdZ5e6Q';
 
+const auth = Router();
+
+let usersController;
+if (config.dbType === 'mongo') {
+  usersController = UsersMongoController;
+} else {
+  usersController = usersPostgresController;
+}
 passport.use(new LocalStrategy({
   usernameField: 'username',
   passwordField: 'password',
