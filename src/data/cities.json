@@ -1,0 +1,29 @@
+[
+  {
+    "name":"St.Petersburg",
+    "country":"Russia",
+    "capital": false,
+    "location": {
+      "lat": 60,
+      "long": 30
+    }
+  },
+  {
+    "name":"Moscow",
+    "country":"Russia",
+    "capital": true,
+    "location": {
+      "lat": 55,
+      "long": 37
+    }
+  },
+  {
+    "name":"Lipetsk",
+    "country":"Russia",
+    "capital": false,
+    "location": {
+      "lat": 52.6,
+      "long": 39.6
+    }
+  }
+]
