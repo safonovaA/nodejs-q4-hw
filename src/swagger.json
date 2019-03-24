@@ -1,0 +1,592 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "description" : "This is API documentation for Nodejs hw.",
+    "version" : "1.0.0",
+    "title" : "Node.js homework"
+  },
+  "host" : "localhost:8080",
+  "basePath" : "/api",
+  "tags" : [ {
+    "name" : "authentification",
+    "description" : "Get token for authentification"
+  }, {
+    "name" : "city",
+    "description" : "Cities information"
+  }, {
+    "name" : "user",
+    "description" : "Users information"
+  }, {
+    "name" : "product",
+    "description" : "Products information"
+  } ],
+  "schemes" : [ "http" ],
+  "paths" : {
+    "/auth-jwt" : {
+      "post" : {
+        "tags" : [ "authentification" ],
+        "summary" : "Get token",
+        "description" : "Get token for authentifition in app",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "auth",
+          "description" : "authentification token",
+          "required" : false,
+          "schema" : {
+            "type": "object",
+            "properties": {
+              "username": {
+                "type": "string"
+              },
+              "password": {
+                "type": "string"
+              }
+            }
+          }
+        }],
+        "responses" : {
+          "200" : {
+            "description" : "Array of cities",
+            "schema" : {
+              "$ref" : "#/definitions/CityList"
+            }
+          }
+        }
+      }
+    },
+    "/cities" : {
+      "get" : {
+        "tags" : [ "city" ],
+        "summary" : "Return list of all cities",
+        "description" : "Return list of all cities",
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Array of cities",
+            "schema" : {
+              "$ref" : "#/definitions/CityList"
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "city" ],
+        "summary" : "Create a city",
+        "description" : "Create a city and return created city",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "city",
+          "description" : "The city to create.",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/CityBody"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "A created city object",
+            "schema" : {
+              "$ref" : "#/definitions/City"
+            }
+          }
+        }
+      }
+    },
+    "/cities/{cityId}" : {
+      "put" : {
+        "tags" : [ "city" ],
+        "summary" : "Modify city",
+        "description" : "Update city by ID",
+        "parameters" : [ {
+          "name" : "cityId",
+          "in" : "path",
+          "description" : "ID of city.",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "in" : "body",
+          "name" : "city",
+          "description" : "The city to create.",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/CityBody"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Updated"
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "city" ],
+        "summary" : "Delete city",
+        "description" : "Delete city by ID",
+        "parameters" : [ {
+          "name" : "cityId",
+          "in" : "path",
+          "description" : "ID of city.",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "202" : {
+            "description" : "Deleted"
+          }
+        }
+      }
+    },
+    "/users" : {
+      "get" : {
+        "tags" : [ "user" ],
+        "summary" : "Return list of all users",
+        "description" : "Return list of all user",
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Array of users",
+            "schema" : {
+              "$ref" : "#/definitions/UserListResponse"
+            }
+          }
+        },
+        "security" : [ {
+          "Bearer" : [ ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "user" ],
+        "summary" : "Create User",
+        "description" : "Create User and return created User",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "user",
+          "description" : "The user to create.",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/User"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "A created user object",
+            "schema" : {
+              "$ref" : "#/definitions/User"
+            }
+          }
+        },
+        "security" : [ {
+          "Bearer" : [ ]
+        } ]
+      }
+    },
+    "/users/{userId}" : {
+      "delete" : {
+        "tags" : [ "user" ],
+        "summary" : "Delete user",
+        "description" : "Delete user by ID",
+        "parameters" : [ {
+          "name" : "userId",
+          "in" : "path",
+          "description" : "ID of user.",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "202" : {
+            "description" : "Deleted"
+          }
+        },
+        "security" : [ {
+          "Bearer" : [ ]
+        } ]
+      }
+    },
+    "/products" : {
+      "get" : {
+        "tags" : [ "product" ],
+        "summary" : "Return list of all products",
+        "description" : "Return list of all products",
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Array of products",
+            "schema" : {
+              "$ref" : "#/definitions/ProductList"
+            }
+          }
+        },
+        "security" : [ {
+          "Bearer" : [ ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "product" ],
+        "summary" : "Create a product",
+        "description" : "Create a product and return created product",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "product",
+          "description" : "The product to create.",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/ProductBody"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "created",
+            "schema" : {
+              "$ref" : "#/definitions/Product"
+            }
+          }
+        },
+        "security" : [ {
+          "Bearer" : [ ]
+        } ]
+      }
+    },
+    "/products/{productId}" : {
+      "get" : {
+        "tags" : [ "product" ],
+        "summary" : "Get product",
+        "description" : "Get product by ID",
+        "parameters" : [ {
+          "name" : "productId",
+          "in" : "path",
+          "description" : "ID of city.",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Product",
+            "schema" : {
+              "$ref" : "#/definitions/Product"
+            }
+          }
+        },
+        "security" : [ {
+          "Bearer" : [ ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "product" ],
+        "summary" : "Delete products",
+        "description" : "Delete product by ID",
+        "parameters" : [ {
+          "name" : "productId",
+          "in" : "path",
+          "description" : "ID of product.",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "202" : {
+            "description" : "Deleted"
+          }
+        },
+        "security" : [ {
+          "Bearer" : [ ]
+        } ]
+      }
+    },
+    "/products/{productId}/reviews" : {
+      "get" : {
+        "tags" : [ "product" ],
+        "summary" : "Get reviews",
+        "description" : "Get all reviews for product by ID",
+        "parameters" : [ {
+          "name" : "productId",
+          "in" : "path",
+          "description" : "ID of city.",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Reviews",
+            "schema" : {
+              "$ref" : "#/definitions/ReviewList"
+            }
+          }
+        },
+        "security" : [ {
+          "Bearer" : [ ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "product" ],
+        "summary" : "Add review",
+        "description" : "Add review to product",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "review",
+          "description" : "Review for product.",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/Review"
+          }
+        }, {
+          "name" : "productId",
+          "in" : "path",
+          "description" : "ID of city.",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "A created review",
+            "schema" : {
+              "$ref" : "#/definitions/Review"
+            }
+          }
+        },
+        "security" : [ {
+          "Bearer" : [ ]
+        } ]
+      }
+    }
+  },
+  "securityDefinitions" : {
+    "Bearer" : {
+      "type" : "apiKey",
+      "name" : "x-access-token",
+      "in" : "header"
+    }
+  },
+  "definitions" : {
+    "LastModifiedAt" : {
+      "type" : "string",
+      "format" : "date-time",
+      "example" : "2019-03-12T21:57:38.727Z"
+    },
+    "City" : {
+      "type" : "object",
+      "required" : [ "capital" ],
+      "properties" : {
+        "_id" : {
+          "type" : "string",
+          "example" : "5c882b0046759f327c197dba"
+        },
+        "name" : {
+          "type" : "string",
+          "example" : "St. Petersburg"
+        },
+        "country" : {
+          "type" : "string",
+          "example" : "Russia"
+        },
+        "capital" : {
+          "type" : "boolean",
+          "example" : false
+        },
+        "location" : {
+          "$ref" : "#/definitions/City_location"
+        },
+        "lastModifiedAt" : {
+          "$ref" : "#/definitions/LastModifiedAt"
+        }
+      }
+    },
+    "CityBody" : {
+      "type" : "object",
+      "required" : [ "capital" ],
+      "properties" : {
+        "name" : {
+          "type" : "string",
+          "example" : "St. Petersburg"
+        },
+        "country" : {
+          "type" : "string",
+          "example" : "Russia"
+        },
+        "capital" : {
+          "type" : "boolean",
+          "example" : false
+        },
+        "location" : {
+          "$ref" : "#/definitions/City_location"
+        }
+      }
+    },
+    "CityList" : {
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/definitions/City"
+      }
+    },
+    "User" : {
+      "type" : "object",
+      "properties" : {
+        "_id" : {
+          "type" : "string",
+          "example" : "5c882b0046759f327c197dba"
+        },
+        "username" : {
+          "type" : "string",
+          "example" : "batman"
+        },
+        "firstName" : {
+          "type" : "string",
+          "example" : "Vasya"
+        },
+        "lastName" : {
+          "type" : "string",
+          "example" : "Pupkin"
+        },
+        "email" : {
+          "type" : "string",
+          "format" : "email",
+          "example" : "batman123@email.com"
+        },
+        "password" : {
+          "type" : "string",
+          "example" : "password123"
+        },
+        "provider" : {
+          "type" : "string",
+          "enum" : [ "internal", "google", "facebook", "twitter" ]
+        },
+        "providerId" : {
+          "type" : "string"
+        },
+        "lastModifiedAt" : {
+          "$ref" : "#/definitions/LastModifiedAt"
+        }
+      }
+    },
+    "UserResponse" : {
+      "type" : "object",
+      "properties" : {
+        "_id" : {
+          "type" : "string",
+          "example" : "5c882b0046759f327c197dba"
+        },
+        "firstName" : {
+          "type" : "string",
+          "example" : "Vasya"
+        },
+        "lastName" : {
+          "type" : "string",
+          "example" : "Pupkin"
+        },
+        "provider" : {
+          "type" : "string",
+          "enum" : [ "internal", "google", "facebook", "twitter" ]
+        },
+        "providerId" : {
+          "type" : "string"
+        }
+      }
+    },
+    "UserListResponse" : {
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/definitions/UserResponse"
+      }
+    },
+    "Product" : {
+      "type" : "object",
+      "properties" : {
+        "_id" : {
+          "type" : "string",
+          "example" : "5c8503968e8439366c636352"
+        },
+        "title" : {
+          "type" : "string",
+          "example" : "cool product"
+        },
+        "description" : {
+          "type" : "string",
+          "example" : "really handy product"
+        },
+        "price" : {
+          "type" : "number",
+          "example" : 100.5
+        },
+        "amount" : {
+          "type" : "number",
+          "example" : 100.0
+        },
+        "lastModifiedAt" : {
+          "$ref" : "#/definitions/LastModifiedAt"
+        }
+      }
+    },
+    "ProductList" : {
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/definitions/Product"
+      }
+    },
+    "ProductBody" : {
+      "type" : "object",
+      "properties" : {
+        "title" : {
+          "type" : "string",
+          "example" : "cool product"
+        },
+        "description" : {
+          "type" : "string",
+          "example" : "really handy product"
+        },
+        "price" : {
+          "type" : "number",
+          "example" : 100.5
+        },
+        "amount" : {
+          "type" : "number",
+          "example" : 100.0
+        }
+      }
+    },
+    "Review" : {
+      "type" : "object",
+      "properties" : {
+        "_id" : {
+          "type" : "string",
+          "example" : "5c882b0046759f327c197dba"
+        },
+        "productId" : {
+          "type" : "string",
+          "example" : "5c992b1046759f327c197fga"
+        },
+        "content" : {
+          "type" : "string",
+          "example" : "Good product!"
+        },
+        "score" : {
+          "type" : "number",
+          "example" : 4.5
+        },
+        "lastModifiedAt" : {
+          "$ref" : "#/definitions/LastModifiedAt"
+        }
+      }
+    },
+    "ReviewList" : {
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/definitions/Review"
+      }
+    },
+    "City_location" : {
+      "properties" : {
+        "lat" : {
+          "type" : "number",
+          "example" : 30.0
+        },
+        "long" : {
+          "type" : "number",
+          "example" : 60.0
+        }
+      }
+    }
+  },
+  "responses" : {
+    "UnauthorizedError" : {
+      "description" : "token is missing or invalid"
+    }
+  }
+}
