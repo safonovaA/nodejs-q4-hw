@@ -9,6 +9,8 @@ import DBMongoose from './database/mongo/db-mongoose';
 import { getDBPort } from './helpers/get-port';
 import bodyParser from 'body-parser';
 import config from './config/config';
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -19,6 +21,7 @@ app.use(parseCookie);
 app.use(parseQuery);
 app.use(bodyParser.json());
 app.use('/api', router);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.listen(port, () => {
   console.log(`App is listening on port ${port}`);
